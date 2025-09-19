@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState ,useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/slices/authSlice";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
-
+  const { loading, error , user } = useSelector((state) => state.auth);
+  
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -14,7 +16,12 @@ export default function LoginPage() {
     e.preventDefault();
     dispatch(login({ email, password }));
   };
-
+  useEffect(() => {
+    if (user) {
+      console.log("✅ Logged in:", user);
+      navigate("/Dashboard");
+    }
+  }, [user, navigate]);
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-96">
@@ -56,7 +63,10 @@ export default function LoginPage() {
 
         <p className="text-center text-gray-600 mt-6">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-blue-600 hover:underline font-medium">
+          <Link
+            to="/signup"
+            className="text-blue-600 hover:underline font-medium"
+          >
             Sign Up
           </Link>
         </p>
