@@ -6,8 +6,8 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-100">
       <DashboardNavbar />
 
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="mt-8">
+      <div className="p-0 max-w-9xl mx-auto">
+        <div className=" bg-white rounded-lg shadow-lg mt-4">
           {/* Nested routes will render here */}
           <Outlet />
         </div>
