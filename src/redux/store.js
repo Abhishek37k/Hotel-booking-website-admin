@@ -5,7 +5,7 @@ import hotelReducer from "./slices/hotelSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-      hotel: hotelReducer,   
+    hotel: hotelReducer,
   },
 });
 export default store;

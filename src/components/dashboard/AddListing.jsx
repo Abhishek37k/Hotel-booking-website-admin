@@ -62,7 +62,7 @@ export default function AddListing() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-10">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-2">
       <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-8">
           ➕ Add New Hotel

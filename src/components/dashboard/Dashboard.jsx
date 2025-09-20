@@ -3,15 +3,12 @@ import DashboardNavbar from "./DashboardNavbar";
 import { Outlet } from "react-router-dom";
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <DashboardNavbar />
 
-      <div className="p-0 max-w-9xl mx-auto">
-        <div className=" bg-white rounded-lg shadow-lg mt-4">
-          {/* Nested routes will render here */}
+        <div className=" bg-white rounded-lg ">
           <Outlet />
         </div>
-      </div>
     </div>
   );
 };

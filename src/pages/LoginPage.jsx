@@ -23,7 +23,7 @@ export default function LoginPage() {
     }
   }, [user, navigate]);
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+    <div className="flex justify-center items-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" style={{ minHeight: "93vh" }}>
       <div className="bg-white shadow-xl rounded-2xl p-8 w-96">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Admin Login

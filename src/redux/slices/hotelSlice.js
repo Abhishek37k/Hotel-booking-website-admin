@@ -15,7 +15,8 @@ export const addHotel = createAsyncThunk(
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "Failed to add hotel");
+      if (!res.ok)
+        throw new Error(data.error?.message || "Failed to add hotel");
 
       return { hotelId: data.name, ...hotelData }; // `data.name` = Firebase generated key
     } catch (err) {
@@ -24,8 +25,58 @@ export const addHotel = createAsyncThunk(
   }
 );
 
+export const fetchHotels = createAsyncThunk(
+  "hotels/fetchHotels",
+  async (token, thunkAPI) => {
+    try {
+      const res = await fetch(`${DB_URL}/hotels.json?auth=${token}`);
+      const data = await res.json();
 
+      if (!res.ok)
+        throw new Error(data.error?.message || "Failed to fetch hotels");
+      if (!data) return [];
 
+      // Convert Firebase object {id: {hotelData}} → array
+      return Object.entries(data).map(([id, value]) => ({
+        hotelId: id,
+        ...value,
+      }));
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+export const deleteHotel = createAsyncThunk(
+  "hotels/deleteHotel",
+  async ({ hotelId, token }, thunkAPI) => {
+    try {
+      const res = await fetch(`${DB_URL}/hotels/${hotelId}.json?auth=${token}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete hotel");
+      return hotelId;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+export const updateHotel = createAsyncThunk(
+  "hotels/updateHotel",
+  async ({ hotelId, hotelData, token }, thunkAPI) => {
+    try {
+      const res = await fetch(`${DB_URL}/hotels/${hotelId}.json?auth=${token}`, {
+        method: "PATCH",
+        body: JSON.stringify(hotelData),
+      });
+      if (!res.ok) throw new Error("Failed to update hotel");
+      console.log("Updated hotel data:", hotelData);
+      return { hotelId, hotelData };
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
 const hotelSlice = createSlice({
   name: "hotels",
   initialState: { hotels: [], loading: false, error: null },
@@ -43,7 +94,34 @@ const hotelSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      ;
+      .addCase(fetchHotels.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchHotels.fulfilled, (state, action) => {
+        state.loading = false;
+        state.hotels = action.payload;
+        console.log("Fetched hotels:", action.payload);
+      })
+      .addCase(fetchHotels.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteHotel.pending, (state) => { state.loading = true; })
+      .addCase(deleteHotel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.hotels = state.hotels.filter(h => h.hotelId !== action.payload);
+      })
+      .addCase(deleteHotel.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // Update hotel
+      .addCase(updateHotel.pending, (state) => { state.loading = true; })
+      .addCase(updateHotel.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.hotels.findIndex(h => h.hotelId === action.payload.hotelId);
+        if (index !== -1) state.hotels[index] = { hotelId: action.payload.hotelId, ...action.payload.hotelData };
+      })
+      .addCase(updateHotel.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
   },
 });
 
