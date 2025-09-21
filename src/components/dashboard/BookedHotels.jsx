@@ -23,7 +23,7 @@ const BookedHotels = () => {
 
             <div className="h-48 w-full overflow-hidden">
               <img
-                src={b.images?.[0] || "https://via.placeholder.com/400x250"}
+                src={b.hotelImgs?.[0] || "https://via.placeholder.com/400x250"}
                 alt={b.hotelName}
                 className="w-full h-full object-cover"
               />

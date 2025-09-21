@@ -52,7 +52,8 @@ const bookingsSlice = createSlice({
           (b) => b.id === action.payload.id
         );
         if (index !== -1) state.bookings[index].status = action.payload.status;
-      });
+      })
+      ;
   },
 });
 
