@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { useDispatch } from "react-redux";
 import { updateHotel } from "../../redux/slices/hotelSlice";
 
-const modalRoot = document.getElementById("modal-root"); 
+const modalRoot = document.getElementById("modal-root");
 
 const EditHotelModal = ({ hotel, onClose, token }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState({ ...hotel });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 10); // trigger animation
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,68 +25,59 @@ const EditHotelModal = ({ hotel, onClose, token }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await dispatch(updateHotel({ hotelId: hotel.hotelId, hotelData: form, token }));
+    await dispatch(
+      updateHotel({ hotelId: hotel.hotelId, hotelData: form, token })
+    );
     onClose();
   };
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative">
-        <h2 className="text-xl font-bold mb-4">Edit Hotel</h2>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            name="name"
-            placeholder="Hotel Name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-          <input
-            name="category"
-            placeholder="Category"
-            value={form.category}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-          <input
-            name="city"
-            placeholder="City"
-            value={form.city}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-          <input
-            name="price"
-            type="number"
-            placeholder="Price per Night"
-            value={form.price}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
+      <div
+        className={`bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 ${
+          isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        }`}
+      >
+        {/* Gradient Header */}
+        <div className="mb-5 p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white text-center text-xl font-bold shadow-md">
+          ✏️ Edit Hotel Details
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {["name", "category", "city", "price"].map((field) => (
+            <input
+              key={field}
+              name={field}
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              type={field === "price" ? "number" : "text"}
+              value={form[field]}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-2xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+              required
+            />
+          ))}
+
           <textarea
             name="images"
             placeholder="Image URLs (comma separated)"
             value={form.images.join(", ")}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded-2xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
           />
-          <div className="flex justify-end space-x-2 mt-2">
+
+          <div className="flex justify-end space-x-3 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+              className="px-4 py-2 rounded-2xl bg-gray-300 hover:bg-gray-400 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-600 text-white font-semibold transition transform hover:scale-105"
             >
-              Save
+              Save Changes
             </button>
           </div>
         </form>

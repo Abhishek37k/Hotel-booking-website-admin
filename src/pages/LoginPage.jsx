@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/slices/authSlice";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -16,31 +15,39 @@ export default function LoginPage() {
     e.preventDefault();
     dispatch(login({ email, password }));
   };
+
   useEffect(() => {
     if (user) {
-      // user is guaranteed to be admin
       navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
+
   return (
-    <div
-      className="flex justify-center items-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-      style={{ minHeight: "93vh" }}
-    >
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-96">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 px-4">
+      {/* Heading outside box */}
+      <div className="mb-8 text-center">
+        <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">
+          Hotel Booking Website
+        </h1>
+       
+      </div>
+
+      {/* Login Card */}
+      <div className="bg-white/95 backdrop-blur-md shadow-2xl rounded-3xl p-8 w-full max-w-md border border-white/30">
+        <p className="text-xl mt-2 text-blue-500 font-semibold text-center tracking-wide py-2">
           Admin Login
-        </h2>
+        </p>
         {error && (
-          <p className="text-red-500 text-center mb-4 bg-red-100 p-2 rounded">
+          <p className="text-red-600 text-center mb-4 bg-red-100 border border-red-300 p-2 rounded-lg text-sm">
             {error}
           </p>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="email"
-            placeholder="Email Address"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Admin Email Address"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -49,7 +56,7 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -57,20 +64,20 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
             disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg transition duration-300 disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
-          Don’t have an account?{" "}
+        <p className="text-center text-gray-600 mt-6 text-sm">
+          Not an admin user?{" "}
           <Link
             to="/signup"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-purple-600 hover:underline font-medium"
           >
-            Sign Up
+            Go to Admin Signup
           </Link>
         </p>
       </div>

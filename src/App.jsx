@@ -14,7 +14,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
+      
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
