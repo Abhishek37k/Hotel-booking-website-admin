@@ -1,4 +1,4 @@
-import { useState ,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/slices/authSlice";
 import { Link } from "react-router-dom";
@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
-  const { loading, error , user } = useSelector((state) => state.auth);
-  
+  const { loading, error, user } = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,12 +18,15 @@ export default function LoginPage() {
   };
   useEffect(() => {
     if (user) {
-      console.log("✅ Logged in:", user);
-      navigate("/Dashboard");
+      // user is guaranteed to be admin
+      navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
   return (
-    <div className="flex justify-center items-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" style={{ minHeight: "93vh" }}>
+    <div
+      className="flex justify-center items-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+      style={{ minHeight: "93vh" }}
+    >
       <div className="bg-white shadow-xl rounded-2xl p-8 w-96">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Admin Login

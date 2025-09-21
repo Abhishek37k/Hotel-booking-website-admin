@@ -3,13 +3,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 const DB_URL = import.meta.env.VITE_FIREBASE_DB_URL;
 
-// console.log("API_KEY:", API_KEY);
-// console.log("DB_URL:", DB_URL);
-
-
+// Signup action
 export const signup = createAsyncThunk(
   "auth/signup",
-  async ({ email, password }, thunkAPI) => {
+  async ({ email, password, role = "admin" }, thunkAPI) => {
     try {
       const res = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
@@ -25,25 +22,21 @@ export const signup = createAsyncThunk(
 
       const { localId, idToken } = data;
 
+      // Save user role in Firebase
       await fetch(`${DB_URL}/users/${localId}.json?auth=${idToken}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          role: "admin", 
-        }),
+        body: JSON.stringify({ email, role }),
       });
 
-      return {
-        user: { email: data.email, role: "admin", localId },
-        token: data.idToken,
-      };
+      return { user: { email, role, localId }, token: idToken };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
+// Login action with role check
 export const login = createAsyncThunk(
   "auth/login",
   async ({ email, password }, thunkAPI) => {
@@ -62,13 +55,16 @@ export const login = createAsyncThunk(
 
       const { localId, idToken } = data;
 
-      const roleRes = await fetch(`${DB_URL}/users/${localId}.json?auth=${idToken}`);
-      const roleData = await roleRes.json();
+      // Fetch user info to get role
+      const userRes = await fetch(`${DB_URL}/users/${localId}.json?auth=${idToken}`);
+      const userData = await userRes.json();
 
-      return {
-        user: { email: data.email, role: roleData.role, localId },
-        token: idToken,
-      };
+      if (userData.role !== "admin") {
+        // Reject login for non-admin users
+        return thunkAPI.rejectWithValue("Access denied. You are not an admin.");
+      }
+
+      return { user: { email: data.email, role: userData.role, localId }, token: idToken };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -102,6 +98,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Signup
       .addCase(signup.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -116,7 +113,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      // Login
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -129,6 +126,8 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
+        state.user = null;   // Reset user on rejected login
+        state.token = null;  // Reset token on rejected login
         state.error = action.payload;
       });
   },
