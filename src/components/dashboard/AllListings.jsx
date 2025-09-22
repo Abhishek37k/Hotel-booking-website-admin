@@ -3,6 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchHotels, deleteHotel } from "../../redux/slices/hotelSlice";
 import EditHotelModal from "./EditHotelModal";
 
+// ✅ Swiper imports for Vite
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 const AllListings = () => {
   const dispatch = useDispatch();
   const { hotels, loading, error } = useSelector((state) => state.hotel);
@@ -56,13 +63,31 @@ const AllListings = () => {
             key={hotel.hotelId}
             className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl hover:-translate-y-1 transform transition duration-300"
           >
-            {hotel.images && hotel.images[0] && (
-              <img
-                src={hotel.images[0]}
-                alt={hotel.name}
-                className="w-full h-52 object-cover"
-              />
+            {/* Swiper Carousel */}
+            {hotel.images?.length > 0 ? (
+              <Swiper
+                modules={[Navigation, Pagination]}
+                navigation
+                  loop={hotel.images.length > 1}
+                pagination={{ clickable: true }}
+                className="h-52"
+              >
+                {hotel.images.map((img, idx) => (
+                  <SwiperSlide key={idx}>
+                    <img
+                      src={img}
+                      alt={`${hotel.name}-${idx}`}
+                      className="w-full h-52 object-cover rounded-t-2xl"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="w-full h-52 bg-gray-200 flex items-center justify-center text-gray-500 rounded-t-2xl">
+                No Image
+              </div>
             )}
+
             <div className="p-6 flex flex-col justify-between">
               <div>
                 <h3 className="text-xl font-bold mb-1 text-gray-800">
